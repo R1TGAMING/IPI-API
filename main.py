@@ -52,7 +52,7 @@ def read_root(name : str):
 ## LAUGH EMOJI API
 @app.get("/api/laughEmoji&&text={text}", response_class=Response)
 async def read_root(text : str) :
-  openimg = Image.open("./images/meme1.jpeg")
+  openimg = Image.open("./images/laughEmoji.jpeg")
   img = ImageDraw.Draw(openimg)
   font = ImageFont.truetype("./fonts/ObelixProB-cyr.ttf", 80)
   _, _, w, h = img.textbbox((0,0), text, font=font)
@@ -63,6 +63,19 @@ async def read_root(text : str) :
   bytes.seek(0)
   return StreamingResponse(BytesIO(bytes.read()), media_type="image/png")
 
-
+@app.get("/api/drakeMeme&&text1={text1}&text2={text2}")
+async def read_root(text1 : str, text2 : str) :
+  openimg = Image.open("./images/drakeMeme.jpeg")
+  img = ImageDraw.Draw(openimg)
+  font = ImageFont.truetype("./fonts/ObelixProB-cyr.ttf", 20)
+  _, _, w, h = img.textbbox((0,0), text1, font=font)
+  W, H = openimg.size
+  img.text((300, 100), text=text1, fill=(255, 255, 255), font=font, stroke_fill = (0,0,0), stroke_width=2)
+  img.text((300,350), text = text2, fill=(255, 255, 255), font=font, stroke_fill = (0,0,0), stroke_width = 2)
+  bytes = BytesIO()
+  openimg.save(bytes, format="PNG")
+  bytes.seek(0)
+  return StreamingResponse(BytesIO(bytes.read()), media_type="image/png")
+  
 if __name__ == "__main__":
     uvicorn.run(app, host='127.0.0.1', port = 8000)
