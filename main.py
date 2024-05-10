@@ -13,6 +13,8 @@ from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+import requests
+
 
 app = FastAPI()
 templates = Jinja2Templates(directory="./main_web")
@@ -81,7 +83,18 @@ async def read_root(text1 : str, text2 : str) :
   bytes.seek(0)
   return StreamingResponse(BytesIO(bytes.read()), media_type="image/png")
 
-
+##Bounty API 40%
+@app.get("/api/bounty/{images}")
+async def read_root(images : str) :
+  res = requests.get(images)
+  
+  profile = Image.open(BytesIO(res.content))
+  bounty = Image.open("./images/Bounty.png")
+  bounty.paste(profile, (0,0))
+  bytes = BytesIO()
+  bounty.save(bytes, format="PNG")
+  bytes.seek(0)
+  return StreamingResponse(BytesIO(bytes.read()), media_type="image/png")
 
 if __name__ == "__main__":
     uvicorn.run(app, host='127.0.0.1', port = 8000)
