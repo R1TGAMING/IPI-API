@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from fastapi import Request
+from fastapi import Request, UploadFile
 import uvicorn
 import userGithub
 from fastapi.responses import JSONResponse 
@@ -83,18 +83,21 @@ async def read_root(text1 : str, text2 : str) :
   bytes.seek(0)
   return StreamingResponse(BytesIO(bytes.read()), media_type="image/png")
 
-##Bounty API 40%
-@app.get("/api/bounty/{images}")
-async def read_root(images : str) :
-  res = requests.get(images)
+## WILL MEME API
+@app.get("/api/willMeme&&text={text}")
+async def read_root(text : str) :
+  openimg = Image.open("./images/willMeme.jpeg")
+  img = ImageDraw.Draw(openimg)
+  font = ImageFont.truetype("./fonts/ObelixProB-cyr.ttf", 50)
+  _,_, w, h = img.textbbox((0,0), text, font=font)
+  W, H = openimg.size
+  img.text((400, 300), text=text, fill=(255, 255, 255), font=font, stroke_fill = (0,0,0), stroke_width=2)
+  byt = BytesIO()
+  openimg.save(byt, format="PNG")
+  byt.seek(0)
+  return StreamingResponse(BytesIO(byt.read()), media_type="image/png")
   
-  profile = Image.open(BytesIO(res.content))
-  bounty = Image.open("./images/Bounty.png")
-  bounty.paste(profile, (0,0))
-  bytes = BytesIO()
-  bounty.save(bytes, format="PNG")
-  bytes.seek(0)
-  return StreamingResponse(BytesIO(bytes.read()), media_type="image/png")
+@app.get("/api/binaryConvert&&number=")
 
 if __name__ == "__main__":
     uvicorn.run(app, host='127.0.0.1', port = 8000)
