@@ -14,7 +14,8 @@ from io import BytesIO
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 import requests
-
+import urllib
+from urllib.parse import unquote
 
 app = FastAPI()
 templates = Jinja2Templates(directory="./main_web")
@@ -96,8 +97,18 @@ async def read_root(text : str) :
   openimg.save(byt, format="PNG")
   byt.seek(0)
   return StreamingResponse(BytesIO(byt.read()), media_type="image/png")
-  
-@app.get("/api/binaryConvert&&number=")
 
+@app.get("/api/wanted/")
+async def read_root(url : str) :
+  response = requests.get(url)
+  openImage = Image.open(BytesIO(response.content))
+  bytes = BytesIO()
+  openImage.save(bytes, format="PNG")
+  bytes.seek(0)
+  draw = ImageDraw.Draw(openImage)
+  response.raise_for_status()
+  return StreamingResponse(bytes, media_type="image/png")
+  
+  
 if __name__ == "__main__":
     uvicorn.run(app, host='127.0.0.1', port = 8000)
