@@ -100,25 +100,28 @@ async def read_root(text : str) :
 
 @app.get("/api/wanted/")
 async def read_root(url : str) :
-  openimg = Image.open("./images/Bounty.jpeg")
-  response = requests.get(url)
-  openImage = Image.open(BytesIO(response.content))
-  height = 536
-  W, H = openImage.size
-  ratio = W / H
+  try :
+    openimg = Image.open("./images/Bounty.jpeg")
+    response = requests.get(url)
+    openImage = Image.open(BytesIO(response.content))
+    height = 536
+    W, H = openImage.size
+    ratio = W / H
   
-  bytes = BytesIO()
-  resize = openImage.resize((int(height * ratio), height))
-  wanted = openimg.copy()
+    bytes = BytesIO()
+    resize = openImage.resize((int(height * ratio), height))
+    wanted = openimg.copy()
   
   
-  wanted.paste(resize, (100,330), )
-  wanted.save(bytes, format="PNG")
-  bytes.seek(0)
-  draw = ImageDraw.Draw(openImage)
-  drawBounty = ImageDraw.Draw(openimg)
-  response.raise_for_status()
-  return StreamingResponse(bytes, media_type="image/png")
+    wanted.paste(resize, (100,330), )
+    wanted.save(bytes, format="PNG")
+    bytes.seek(0)
+    draw = ImageDraw.Draw(openImage)
+    drawBounty = ImageDraw.Draw(openimg)
+    response.raise_for_status()
+    return StreamingResponse(bytes, media_type="image/png") 
+  except Exception as e :
+      return JSONResponse(status_code=400, content={"error": "image's not valid"})
   
   
 if __name__ == "__main__":
