@@ -122,7 +122,28 @@ async def read_root(url : str) :
     return StreamingResponse(bytes, media_type="image/png") 
   except Exception as e :
       return JSONResponse(status_code=400, content={"error": "image's not valid"})
+
+@app.get("/api/rip/")
+async def read_root(image1 : str, image2 : str) :
+  openimg = Image.open("./images/rip.jpeg")
+  response = requests.get(image1)
+  response2 = requests.get(image2)
+  openImage = Image.open(BytesIO(response.content))
+  openImage2 = Image.open(BytesIO(response2.content))
+  bytes = BytesIO()
+  height = 150
+  W1, H1 = openImage.size
+  W2, H2 = openImage2.size
+  ratio1 = W1 / H1
+  ratio2 = W2 / H2
+  resize_image1 = openImage.resize((int(height * ratio1), 150))
+  resize_image2 = openImage2.resize((int(height * ratio2), 150))
   
+  openimg.paste(resize_image1, (280,160))
+  openimg.paste(resize_image2, (20,120))
+  openimg.save(bytes, format="PNG")
+  bytes.seek(0)
+  return StreamingResponse(bytes, media_type="image/png")
   
 if __name__ == "__main__":
     uvicorn.run(app, host='127.0.0.1', port = 8000)
