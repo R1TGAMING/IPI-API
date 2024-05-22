@@ -144,6 +144,21 @@ async def read_root(image1 : str, image2 : str) :
   openimg.save(bytes, format="PNG")
   bytes.seek(0)
   return StreamingResponse(bytes, media_type="image/png")
+
+@app.get("/api/jail/")
+async def read_root(url : str) :
+  openimg = Image.open("./images/jail.png").convert("RGBA")
+  response = requests.get(url)
+  openImage = Image.open(BytesIO(response.content))
+  bytes = BytesIO()
+  profileuser = openimg.copy()
+  profileuser.paste(openImage, (0,0))
+  profileuser.save(bytes, format="PNG")
+  draw = ImageDraw.Draw(openimg)
+  draws = ImageDraw.Draw(openImage)
+  bytes.seek(0)
+  return StreamingResponse(bytes, media_type="image/png")
+  
   
 if __name__ == "__main__":
     uvicorn.run(app, host='127.0.0.1', port = 8000)
